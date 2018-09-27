@@ -21,12 +21,5 @@ public class ExtractVideo
 	
 
 	public ExtractVideo(){}
-	
-	public ExtractVideo(String inputVideo, String output, String desde, String hasta){
-		this.inputVideo = inputVideo;
-		this.output = output;
-		this.desde = desde;
-		this.hasta = hasta;
-	}
 		
 }
