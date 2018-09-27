@@ -18,5 +18,7 @@ public class ExtractVideo
 	
 	@Flag(onClose = "", control = Control.fileChooser)
 	private String output;
+	
+	public ExtractVideo() {}
 		
 }
