@@ -96,7 +96,7 @@ public class Inicializador
 						if(anotation != null){
 															
 							JLabel variableAux = new JLabel(variable.getName().concat(":"));
-							variableAux.setBounds(posAnchoLabel, posAltoLabel, 500, 100);
+							variableAux.setBounds(posAnchoLabel, posAltoLabel, 500, 250);
 							variableAux.setFont(new Font("Tahoma", Font.PLAIN, 50));
 							aplicacion.add(variableAux);
 								
@@ -105,7 +105,7 @@ public class Inicializador
 							if (anotation.control() == Control.text){
 								
 								JTextField textField = new JTextField();
-								textField.setBounds(posAnchoLabel, posAltoLabel, 500, 100);
+								textField.setBounds(posAnchoLabel, posAltoLabel, 1000, 250);
 								textField.setFont(new Font("Tahoma", Font.PLAIN, 50));
 								aplicacion.add(textField);
 							
@@ -132,7 +132,7 @@ public class Inicializador
 										}
 									}
 								});
-								textField.setBounds(posAnchoLabel, posAltoLabel, 500, 100);
+								textField.setBounds(posAnchoLabel, posAltoLabel, 1000, 250);
 								textField.setFont(new Font("Tahoma", Font.PLAIN, 50));
 								aplicacion.add(textField);
 							
@@ -142,10 +142,10 @@ public class Inicializador
 								
 							}
 							
-							if (anotation.control() == Control.time){
+							if (anotation.control() == Control.time){ // NO FUNCA
 								
 								JFormattedTextField textField = new JFormattedTextField( new SimpleDateFormat ("mm:ss") );
-								textField.setBounds(posAnchoLabel, posAltoLabel, 500, 100);
+								textField.setBounds(posAnchoLabel, posAltoLabel, 1000, 250);
 								textField.setFont(new Font("Tahoma", Font.PLAIN, 50));
 								aplicacion.add(textField);
 							
@@ -158,7 +158,7 @@ public class Inicializador
 							if (anotation.control() == Control.fileChooser){
 								
 								JFileChooser textField = new JFileChooser();
-								textField.setBounds(posAnchoLabel, posAltoLabel, 500, 100);
+								textField.setBounds(posAnchoLabel, posAltoLabel, 1000, 250);
 								textField.setFont(new Font("Tahoma", Font.PLAIN, 50));
 								aplicacion.add(textField);
 							
@@ -168,7 +168,7 @@ public class Inicializador
 								
 							}
 							
-							posAltoLabel += 200;						
+							posAltoLabel += 350;						
 							posAnchoLabel = 100;
 									
 						}
@@ -176,7 +176,7 @@ public class Inicializador
 					}
 						
 					JButton button = new JButton("Procesar");
-					button.setBounds(posAnchoLabel + 650, posAltoLabel, 400, 75);
+					button.setBounds(posAnchoLabel + 900, posAltoLabel, 400, 75);
 					button.setFont(new Font("Tahoma", Font.PLAIN, 75));
 					button.addActionListener(new ActionListener() {
 						public void actionPerformed(ActionEvent e) {
@@ -209,7 +209,7 @@ public class Inicializador
 					});
 					aplicacion.add(button);
 						
-					aplicacion.setBounds(0, 0, 1300, posAltoLabel + 300);
+					aplicacion.setBounds(0, 0, 1850, posAltoLabel + 300);
 					aplicacion.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 					aplicacion.getContentPane().setLayout(null);
 					aplicacion.setVisible(true);
