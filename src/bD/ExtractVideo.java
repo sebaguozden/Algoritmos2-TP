@@ -16,7 +16,7 @@ public class ExtractVideo
 	@Flag(name = "-to", control = Control.time)
 	private String hasta;
 	
-	@Flag(onClose = "", control = Control.fileChooser)
+	@Flag(onClose = "", control = Control.text)
 	private String output;
 	
 	public ExtractVideo() {}

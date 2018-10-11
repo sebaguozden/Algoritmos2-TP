@@ -8,12 +8,12 @@ public class AudioToVideo
 {	
 	
 	@Flag(name = "-i", control = Control.fileChooser)
-	private String inputVideo;
+	private String inputFoto;
 	
 	@Flag(name = "-i", control = Control.fileChooser)
 	private String inputAudio;
 	
-	@Flag(name = "-c:v copy -c:a copy", control = Control.fileChooser)
+	@Flag(name = "-c:v copy -c:a copy", control = Control.text)
 	private String output;
 
 	public AudioToVideo(){}

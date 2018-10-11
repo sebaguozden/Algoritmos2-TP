@@ -7,12 +7,14 @@ import java.lang.annotation.RetentionPolicy;
 public @interface Flag
 {
 	
-	String name() default "";
-	
 	Control control() default Control.text;
 	
 	String onOpen() default " ";
 	
+	String name() default "";
+	
 	String onClose() default " ";
+	
+	String post() default "";
 	
 }

@@ -11,8 +11,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
-import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -25,12 +26,12 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
-import javax.swing.JFormattedTextField;
 
 public class Inicializador
 {
 	
 	private JFrame frmAplicaciones;
+	private boolean firstClick;
 
 	/**
 	 * Launch the application.
@@ -88,12 +89,15 @@ public class Inicializador
 					aplicacion.setTitle(aplicacionClass.getSimpleName());
 					
 					final HashMap<Field,JComponent> jFieldMap = new HashMap<Field,JComponent>();
+					final List<Field> variablesOrdenadas = new ArrayList<Field>();
 					
 					for(Field variable : aplicacionClass.getDeclaredFields()){
 						 						
 						Flag anotation=variable.getAnnotation(Flag.class);
 						
 						if(anotation != null){
+							
+							variablesOrdenadas.add(variable);
 															
 							JLabel variableAux = new JLabel(variable.getName().concat(":"));
 							variableAux.setBounds(posAnchoLabel, posAltoLabel, 500, 250);
@@ -142,9 +146,23 @@ public class Inicializador
 								
 							}
 							
-							if (anotation.control() == Control.time){ // NO FUNCA
+							if (anotation.control() == Control.time){
 								
-								JFormattedTextField textField = new JFormattedTextField( new SimpleDateFormat ("mm:ss") );
+								JTextField textField = new JTextField();
+								textField.addKeyListener(new KeyAdapter() {
+									@Override
+									public void keyTyped(KeyEvent e) {
+										char validar = e.getKeyChar();
+										
+										if (Character.isLetter(validar)){
+											
+											Toolkit.getDefaultToolkit().beep();
+											e.consume();
+											
+											JOptionPane.showMessageDialog(null, "Ingresar SOLO horarios");
+										}
+									}
+								});
 								textField.setBounds(posAnchoLabel, posAltoLabel, 1000, 250);
 								textField.setFont(new Font("Tahoma", Font.PLAIN, 50));
 								aplicacion.add(textField);
@@ -165,7 +183,6 @@ public class Inicializador
 								//textField.getSelectedFile();
 								
 								jFieldMap.put(variable,textField);
-								
 							}
 							
 							posAltoLabel += 350;						
@@ -178,30 +195,31 @@ public class Inicializador
 					JButton button = new JButton("Procesar");
 					button.setBounds(posAnchoLabel + 900, posAltoLabel, 400, 75);
 					button.setFont(new Font("Tahoma", Font.PLAIN, 75));
+					firstClick=true;
 					button.addActionListener(new ActionListener() {
 						public void actionPerformed(ActionEvent e) {
-															
-							JOptionPane.showMessageDialog(null, "Procesando" );
-								
-							HashMap<Field,String> fieldMap = new HashMap<Field,String>();
-								
-							for( Field variableAux : jFieldMap.keySet()){
-								if (jFieldMap.get(variableAux) instanceof JFileChooser) {
-									fieldMap.put(variableAux, ((JFileChooser)jFieldMap.get(variableAux)).getSelectedFile().getPath() );
-								}if (jFieldMap.get(variableAux) instanceof JTextField){
-									fieldMap.put(variableAux, ((JLabel)jFieldMap.get(variableAux)).getText().toString() );
+							if (firstClick){
+								firstClick = false;
+								HashMap<Field,String> fieldMap = new HashMap<Field,String>();
+									
+								for( Field variableAux : jFieldMap.keySet()){
+									if (jFieldMap.get(variableAux) instanceof JFileChooser) {
+										fieldMap.put(variableAux, ((JFileChooser)jFieldMap.get(variableAux)).getSelectedFile().getPath() );
+									}if (jFieldMap.get(variableAux) instanceof JTextField){
+										fieldMap.put(variableAux, ((JTextField)jFieldMap.get(variableAux)).getText().toString() );
+									}
 								}
-							}
-																						
-							try
-							{
-								ejecutar(aplicacionClass, fieldMap);
-								JOptionPane.showMessageDialog(null, "Procesamiento Finalizado" );
-							}
-							catch(IOException ex)
-							{
-								JOptionPane.showMessageDialog(null, "Procesamiento Fallido" );
-								//JOptionPane.showMessageDialog(null, ex.printStackTrace() ); NO SE COMO MOSTRAR EL TRACE ERROR
+																							
+								try
+								{
+									ejecutar(aplicacionClass, fieldMap, variablesOrdenadas);
+									JOptionPane.showMessageDialog(null, "Procesamiento Finalizado" );
+								}
+								catch(IOException ex)
+								{
+									JOptionPane.showMessageDialog(null, "Procesamiento Fallido" );
+									//JOptionPane.showMessageDialog(null, ex.printStackTrace() ); NO SE COMO MOSTRAR EL TRACE ERROR
+								}
 							}
 																
 						}
@@ -226,23 +244,30 @@ public class Inicializador
         frmAplicaciones.getContentPane().setLayout(null);
 	}
 
-	private void ejecutar(Class<?> aplicacionClass, HashMap<Field,String> fieldMap) throws IOException
+	private void ejecutar(Class<?> aplicacionClass, HashMap<Field,String> fieldMap, List<Field> variablesOrdenadas) throws IOException
 	{
 
 		String peticion = "";
 		
 		final ProgramaComando anotacionObtenidaPrograma = aplicacionClass.getAnnotation(ProgramaComando.class);
 		if (anotacionObtenidaPrograma != null) {
-			peticion.concat(anotacionObtenidaPrograma.flag());
+			peticion = peticion.concat(anotacionObtenidaPrograma.flag());
 		}
 		
-		for( Field variableAux : fieldMap.keySet()){
+		
+		for( Field variableAux : variablesOrdenadas){
 			Flag anotacionObtenidaVariable = variableAux.getAnnotation(Flag.class);
-			peticion.concat(anotacionObtenidaVariable.onOpen());
-			peticion.concat(anotacionObtenidaVariable.name());
-			peticion.concat(anotacionObtenidaVariable.onClose());
-			peticion.concat(fieldMap.get(variableAux));
+			if (anotacionObtenidaVariable != null) {
+				peticion = peticion.concat(anotacionObtenidaVariable.onOpen());
+				peticion = peticion.concat(anotacionObtenidaVariable.name());
+				peticion = peticion.concat(anotacionObtenidaVariable.onClose());
+				if (variableAux.getName().equals("output")) peticion = peticion.concat("C:\\Users\\Seba\\Desktop\\");
+				peticion = peticion.concat(fieldMap.get(variableAux));
+				peticion = peticion.concat(anotacionObtenidaVariable.post());
+			}
 		}
+		
+		System.out.println(peticion);
 		
 		Process p = Runtime.getRuntime().exec(peticion);
 		BufferedReader br = new BufferedReader ( new InputStreamReader ( p.getInputStream() ) );
