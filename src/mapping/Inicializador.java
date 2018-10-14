@@ -31,7 +31,6 @@ public class Inicializador
 {
 	
 	private JFrame frmAplicaciones;
-	private boolean firstClick;
 
 	/**
 	 * Launch the application.
@@ -195,13 +194,13 @@ public class Inicializador
 					JButton button = new JButton("Procesar");
 					button.setBounds(posAnchoLabel + 900, posAltoLabel, 400, 75);
 					button.setFont(new Font("Tahoma", Font.PLAIN, 75));
-					firstClick=true;
 					button.addActionListener(new ActionListener() {
 						public void actionPerformed(ActionEvent e) {
-							if (firstClick){
-								firstClick = false;
-								HashMap<Field,String> fieldMap = new HashMap<Field,String>();
-									
+							HashMap<Field,String> fieldMap = new HashMap<Field,String>();
+							
+							
+							try
+							{
 								for( Field variableAux : jFieldMap.keySet()){
 									if (jFieldMap.get(variableAux) instanceof JFileChooser) {
 										fieldMap.put(variableAux, ((JFileChooser)jFieldMap.get(variableAux)).getSelectedFile().getPath() );
@@ -209,17 +208,13 @@ public class Inicializador
 										fieldMap.put(variableAux, ((JTextField)jFieldMap.get(variableAux)).getText().toString() );
 									}
 								}
-																							
-								try
-								{
 									ejecutar(aplicacionClass, fieldMap, variablesOrdenadas);
 									JOptionPane.showMessageDialog(null, "Procesamiento Finalizado" );
-								}
-								catch(IOException ex)
-								{
-									JOptionPane.showMessageDialog(null, "Procesamiento Fallido" );
-									//JOptionPane.showMessageDialog(null, ex.printStackTrace() ); NO SE COMO MOSTRAR EL TRACE ERROR
-								}
+							}
+							catch(Exception ex)
+							{
+								JOptionPane.showMessageDialog(null, "Procesamiento Fallido" );
+								//JOptionPane.showMessageDialog(null, ex.printStackTrace() ); NO SE COMO MOSTRAR EL TRACE ERROR
 							}
 																
 						}
@@ -269,16 +264,17 @@ public class Inicializador
 		
 		System.out.println(peticion);
 		
-		Process p = Runtime.getRuntime().exec(peticion);
-		BufferedReader br = new BufferedReader ( new InputStreamReader ( p.getInputStream() ) );
-				
-		String line = "";
-				
-		while ( ( line = br.readLine() ) != null ){
-					
-			System.out.println("La linea es " + line);
-				
-		}
+		//Process p =	
+				Runtime.getRuntime().exec(peticion);
+//		BufferedReader br = new BufferedReader ( new InputStreamReader ( p.getInputStream() ) );
+//				
+//		String line = "";
+//				
+//		while ( ( line = br.readLine() ) != null ){
+//					
+//			System.out.println("La linea es " + line);
+//				
+//		}
 	
 	}
 	
