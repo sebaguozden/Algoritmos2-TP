@@ -8,6 +8,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
@@ -175,6 +176,7 @@ public class Inicializador
 							if (anotation.control() == Control.fileChooser){
 								
 								JFileChooser textField = new JFileChooser();
+								textField.setCurrentDirectory(new File("C:\\Users\\Seba\\Desktop"));
 								textField.setBounds(posAnchoLabel, posAltoLabel, 1000, 250);
 								textField.setFont(new Font("Tahoma", Font.PLAIN, 50));
 								aplicacion.add(textField);
@@ -197,7 +199,6 @@ public class Inicializador
 					button.addActionListener(new ActionListener() {
 						public void actionPerformed(ActionEvent e) {
 							HashMap<Field,String> fieldMap = new HashMap<Field,String>();
-							
 							
 							try
 							{
@@ -264,17 +265,17 @@ public class Inicializador
 		
 		System.out.println(peticion);
 		
-		//Process p =	
+		Process p =	
 				Runtime.getRuntime().exec(peticion);
-//		BufferedReader br = new BufferedReader ( new InputStreamReader ( p.getInputStream() ) );
-//				
-//		String line = "";
-//				
-//		while ( ( line = br.readLine() ) != null ){
-//					
-//			System.out.println("La linea es " + line);
-//				
-//		}
+		BufferedReader br = new BufferedReader ( new InputStreamReader ( p.getInputStream() ) );
+				
+		String line = "";
+				
+		while ( ( line = br.readLine() ) != null ){
+					
+			System.out.println("La linea es " + line);
+				
+		}
 	
 	}
 	
