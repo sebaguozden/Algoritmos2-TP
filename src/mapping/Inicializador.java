@@ -12,14 +12,21 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
+import java.sql.Time;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JSpinner;
 import javax.swing.JTextField;
+import javax.swing.SpinnerDateModel;
+import javax.swing.SpinnerNumberModel;
 
 import org.reflections.Reflections;
 
@@ -30,6 +37,9 @@ import javax.swing.JFileChooser;
 
 public class Inicializador
 {
+	private List<String> inputFotoExt = new ArrayList<String>();
+	private List<String> inputAudioExt = new ArrayList<String>();
+	private List<String> inputVideoExt = new ArrayList<String>();
 	
 	private JFrame frmAplicaciones;
 
@@ -68,6 +78,12 @@ public class Inicializador
 	 */
 	private void initialize()
 	{
+		
+		inputFotoExt.add("jpg");
+		inputAudioExt.add("m4p");
+		inputVideoExt.add("mp4");
+		inputVideoExt.add("avi");
+		
 		int posAncho = 100;
 		int posAlto = 100;
 		
@@ -120,54 +136,30 @@ public class Inicializador
 							}
 							
 							if (anotation.control() == Control.numeric){
-								
-								JTextField textField = new JTextField();
-								textField.addKeyListener(new KeyAdapter() {
-									@Override
-									public void keyTyped(KeyEvent e) {
-										char validar = e.getKeyChar();
-										
-										if (Character.isLetter(validar)){
-											
-											Toolkit.getDefaultToolkit().beep();
-											e.consume();
-											
-											JOptionPane.showMessageDialog(null, "Ingresar SOLO numeros");
-										}
-									}
-								});
+
+								JSpinner textField = new JSpinner();
 								textField.setBounds(posAnchoLabel, posAltoLabel, 1000, 250);
 								textField.setFont(new Font("Tahoma", Font.PLAIN, 50));
 								aplicacion.add(textField);
 							
-								//textField.getText();
+								//textField.getValue();
 								
 								jFieldMap.put(variable,textField);
 								
 							}
 							
 							if (anotation.control() == Control.time){
+							
+								SpinnerDateModel sm = new SpinnerDateModel(new Time(0,0,0), null, null, Calendar.HOUR_OF_DAY);
+								JSpinner textField = new JSpinner(sm);
+								JSpinner.DateEditor editor = new JSpinner.DateEditor(textField, "mm:ss");
+								textField.setEditor(editor);
 								
-								JTextField textField = new JTextField();
-								textField.addKeyListener(new KeyAdapter() {
-									@Override
-									public void keyTyped(KeyEvent e) {
-										char validar = e.getKeyChar();
-										
-										if (Character.isLetter(validar)){
-											
-											Toolkit.getDefaultToolkit().beep();
-											e.consume();
-											
-											JOptionPane.showMessageDialog(null, "Ingresar SOLO horarios");
-										}
-									}
-								});
 								textField.setBounds(posAnchoLabel, posAltoLabel, 1000, 250);
 								textField.setFont(new Font("Tahoma", Font.PLAIN, 50));
 								aplicacion.add(textField);
 							
-								//textField.getText();
+								//textField.getValue();
 								
 								jFieldMap.put(variable,textField);
 								
@@ -175,15 +167,26 @@ public class Inicializador
 							
 							if (anotation.control() == Control.fileChooser){
 								
-								JFileChooser textField = new JFileChooser();
-								textField.setCurrentDirectory(new File("C:\\Users\\Seba\\Desktop"));
+								JButton textField = new JButton("Seleccionar");
 								textField.setBounds(posAnchoLabel, posAltoLabel, 1000, 250);
 								textField.setFont(new Font("Tahoma", Font.PLAIN, 50));
-								aplicacion.add(textField);
-							
-								//textField.getSelectedFile();
+								textField.addActionListener(new ActionListener() {
+									public void actionPerformed(ActionEvent e) {
 								
-								jFieldMap.put(variable,textField);
+										JFileChooser fileChooser = new JFileChooser();
+										fileChooser.setCurrentDirectory(new File("C:\\Users\\Seba\\Desktop"));
+										fileChooser.showOpenDialog(aplicacion);
+									
+										//textField.getSelectedFile();
+										
+										textField.setText(fileChooser.getSelectedFile().toString());
+										
+										jFieldMap.put(variable,textField);
+								
+									}
+								});
+																		
+								aplicacion.add(textField);
 							}
 							
 							posAltoLabel += 350;						
@@ -203,11 +206,41 @@ public class Inicializador
 							try
 							{
 								for( Field variableAux : jFieldMap.keySet()){
-									if (jFieldMap.get(variableAux) instanceof JFileChooser) {
-										fieldMap.put(variableAux, ((JFileChooser)jFieldMap.get(variableAux)).getSelectedFile().getPath() );
-									}if (jFieldMap.get(variableAux) instanceof JTextField){
-										fieldMap.put(variableAux, ((JTextField)jFieldMap.get(variableAux)).getText().toString() );
+									if (jFieldMap.get(variableAux) instanceof JButton) {
+										String extension = ((JButton)jFieldMap.get(variableAux)).getText().split("\\.")[1];
+										if (variableAux.getName().equals("inputFoto")){
+											if (inputFotoExt.stream().anyMatch(ext -> ext.equals(extension))){
+												fieldMap.put(variableAux, ((JButton)jFieldMap.get(variableAux)).getText() );
+											}else{
+												new RuntimeException("inputFoto tiene que ser .jpg");
+											}
+										}else if (variableAux.getName().equals("inputAudio")){
+											if (inputAudioExt.stream().anyMatch(ext -> ext.equals(extension))){
+												fieldMap.put(variableAux, ((JButton)jFieldMap.get(variableAux)).getText() );
+											}else{
+												new RuntimeException("inputAudio tiene que ser .m4p");
+											}
+										}else if (variableAux.getName().equals("inputVideo")){
+											if (inputVideoExt.stream().anyMatch(ext -> ext.equals(extension))){
+												fieldMap.put(variableAux, ((JButton)jFieldMap.get(variableAux)).getText() );
+											}else{
+												new RuntimeException("inputFoto tiene que ser .avi o .mp4");
+											}
+										}
+									}else if (jFieldMap.get(variableAux) instanceof JSpinner){
+										Date date = (Date)((JSpinner)jFieldMap.get(variableAux)).getValue();
+										SimpleDateFormat format = new SimpleDateFormat("mm:ss");
+				                        String time = format.format(date);
+										fieldMap.put(variableAux, time);
+									}else if (jFieldMap.get(variableAux) instanceof JTextField){
+										String extension = ((JTextField)jFieldMap.get(variableAux)).getText().toString().split("\\.")[1];
+										if ("avi".equals(extension)){
+											fieldMap.put(variableAux, ((JTextField)jFieldMap.get(variableAux)).getText().toString() );
+										}else{
+											new RuntimeException("output tiene que ser .avi");
+										}
 									}
+									
 								}
 									ejecutar(aplicacionClass, fieldMap, variablesOrdenadas);
 									JOptionPane.showMessageDialog(null, "Procesamiento Finalizado" );
@@ -215,7 +248,7 @@ public class Inicializador
 							catch(Exception ex)
 							{
 								JOptionPane.showMessageDialog(null, "Procesamiento Fallido" );
-								//JOptionPane.showMessageDialog(null, ex.printStackTrace() ); NO SE COMO MOSTRAR EL TRACE ERROR
+								//JOptionPane.showMessageDialog(null, ex.getMessage() );
 							}
 																
 						}
