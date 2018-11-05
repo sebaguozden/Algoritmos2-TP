@@ -26,7 +26,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerDateModel;
-import javax.swing.SpinnerNumberModel;
 
 import org.reflections.Reflections;
 
@@ -137,12 +136,26 @@ public class Inicializador
 							
 							if (anotation.control() == Control.numeric){
 
-								JSpinner textField = new JSpinner();
+								JTextField textField = new JTextField();
+								textField.addKeyListener(new KeyAdapter() {
+									@Override
+									public void keyTyped(KeyEvent e) {
+										char validar = e.getKeyChar();
+										
+										if (Character.isLetter(validar)){
+											
+											Toolkit.getDefaultToolkit().beep();
+											e.consume();
+											
+											JOptionPane.showMessageDialog(null, "Ingresar SOLO numeros");
+										}
+									}
+								});
 								textField.setBounds(posAnchoLabel, posAltoLabel, 1000, 250);
 								textField.setFont(new Font("Tahoma", Font.PLAIN, 50));
 								aplicacion.add(textField);
 							
-								//textField.getValue();
+								//textField.getText();
 								
 								jFieldMap.put(variable,textField);
 								
@@ -212,20 +225,25 @@ public class Inicializador
 											if (inputFotoExt.stream().anyMatch(ext -> ext.equals(extension))){
 												fieldMap.put(variableAux, ((JButton)jFieldMap.get(variableAux)).getText() );
 											}else{
+												JOptionPane.showMessageDialog(null, "inputFoto tiene que ser .jpg" );
 												new RuntimeException("inputFoto tiene que ser .jpg");
 											}
 										}else if (variableAux.getName().equals("inputAudio")){
 											if (inputAudioExt.stream().anyMatch(ext -> ext.equals(extension))){
 												fieldMap.put(variableAux, ((JButton)jFieldMap.get(variableAux)).getText() );
 											}else{
+												JOptionPane.showMessageDialog(null, "inputAudio tiene que ser .m4p" );
 												new RuntimeException("inputAudio tiene que ser .m4p");
 											}
 										}else if (variableAux.getName().equals("inputVideo")){
 											if (inputVideoExt.stream().anyMatch(ext -> ext.equals(extension))){
 												fieldMap.put(variableAux, ((JButton)jFieldMap.get(variableAux)).getText() );
 											}else{
+												JOptionPane.showMessageDialog(null, "inputFoto tiene que ser .avi o .mp4" );
 												new RuntimeException("inputFoto tiene que ser .avi o .mp4");
 											}
+										}else{
+											fieldMap.put(variableAux, ((JTextField)jFieldMap.get(variableAux)).getText().toString() );
 										}
 									}else if (jFieldMap.get(variableAux) instanceof JSpinner){
 										Date date = (Date)((JSpinner)jFieldMap.get(variableAux)).getValue();
@@ -237,6 +255,8 @@ public class Inicializador
 										if ("avi".equals(extension)){
 											fieldMap.put(variableAux, ((JTextField)jFieldMap.get(variableAux)).getText().toString() );
 										}else{
+											//Mostrar aca el joptionpane
+											JOptionPane.showMessageDialog(null, "output tiene que ser .avi" );
 											new RuntimeException("output tiene que ser .avi");
 										}
 									}
@@ -247,7 +267,7 @@ public class Inicializador
 							}
 							catch(Exception ex)
 							{
-								JOptionPane.showMessageDialog(null, "Procesamiento Fallido" );
+								//JOptionPane.showMessageDialog(null, "Procesamiento Fallido" );
 								//JOptionPane.showMessageDialog(null, ex.getMessage() );
 							}
 																
