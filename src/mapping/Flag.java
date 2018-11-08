@@ -16,5 +16,11 @@ public @interface Flag
 	String onClose() default " ";
 	
 	String post() default "";
+
+	Class<? extends FlagValidator> validator() default FlagValidator.class;
+
+	String post2() default "";
+
+	Class<? extends Conversor> conversor() default Conversor.class;
 	
 }

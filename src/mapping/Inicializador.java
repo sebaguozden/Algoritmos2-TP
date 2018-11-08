@@ -251,13 +251,17 @@ public class Inicializador
 				                        String time = format.format(date);
 										fieldMap.put(variableAux, time);
 									}else if (jFieldMap.get(variableAux) instanceof JTextField){
-										String extension = ((JTextField)jFieldMap.get(variableAux)).getText().toString().split("\\.")[1];
-										if ("avi".equals(extension)){
-											fieldMap.put(variableAux, ((JTextField)jFieldMap.get(variableAux)).getText().toString() );
+										if (variableAux.getName().equals("output")){
+											String extension = ((JTextField)jFieldMap.get(variableAux)).getText().toString().split("\\.")[1];
+											if ("avi".equals(extension)){
+												fieldMap.put(variableAux, ((JTextField)jFieldMap.get(variableAux)).getText().toString() );
+											}else{
+												//Mostrar aca el joptionpane
+												JOptionPane.showMessageDialog(null, "output tiene que ser .avi" );
+												new RuntimeException("output tiene que ser .avi");
+											}
 										}else{
-											//Mostrar aca el joptionpane
-											JOptionPane.showMessageDialog(null, "output tiene que ser .avi" );
-											new RuntimeException("output tiene que ser .avi");
+											fieldMap.put(variableAux, ((JTextField)jFieldMap.get(variableAux)).getText().toString() );
 										}
 									}
 									
@@ -293,7 +297,7 @@ public class Inicializador
         frmAplicaciones.getContentPane().setLayout(null);
 	}
 
-	private void ejecutar(Class<?> aplicacionClass, HashMap<Field,String> fieldMap, List<Field> variablesOrdenadas) throws IOException
+	private void ejecutar(Class<?> aplicacionClass, HashMap<Field,String> fieldMap, List<Field> variablesOrdenadas) throws IOException, InstantiationException, IllegalAccessException
 	{
 
 		String peticion = "";
@@ -311,8 +315,14 @@ public class Inicializador
 				peticion = peticion.concat(anotacionObtenidaVariable.name());
 				peticion = peticion.concat(anotacionObtenidaVariable.onClose());
 				if (variableAux.getName().equals("output")) peticion = peticion.concat("C:\\Users\\Seba\\Desktop\\");
-				peticion = peticion.concat(fieldMap.get(variableAux));
-				peticion = peticion.concat(anotacionObtenidaVariable.post());
+				Conversor conversor = variableAux.getAnnotation(Flag.class).conversor().newInstance();
+				peticion = peticion.concat(conversor.convertir(fieldMap.get(variableAux)));
+				FlagValidator validator = variableAux.getAnnotation(Flag.class).validator().newInstance();
+				if( validator.validar(fieldMap.get(variableAux)) ){
+					peticion = peticion.concat(anotacionObtenidaVariable.post());
+				}else{
+					peticion = peticion.concat(anotacionObtenidaVariable.post2());
+				}
 			}
 		}
 		
@@ -324,7 +334,7 @@ public class Inicializador
 				
 		String line = "";
 				
-		while ( ( line = br.readLine() ) != null ){
+		while ( ( line = br.readLine() ) != null ){ 
 					
 			System.out.println("La linea es " + line);
 				
